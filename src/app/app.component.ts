@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {CellInterface} from './cell/cell.interface';
 import {CellModel} from './cell/cell.model';
+import {Vector} from './cell/vector.enum';
 
 @Component({
   selector: 'app-root',
@@ -107,48 +108,57 @@ export class AppComponent {
   }
 
   moveAnt(cellValue: CellInterface): void {
-    let XChanged = false;
-
     if (cellValue.value) {
-      if (!cellValue.vectorY && cellValue.vectorX) {
-        cellValue.vectorY = !cellValue.vectorY;
-      } else if (cellValue.vectorY && cellValue.vectorX) {
-        cellValue.vectorX = !cellValue.vectorX;
-        XChanged = true;
-      } else if (cellValue.vectorY && !cellValue.vectorX) {
-        cellValue.vectorY = !cellValue.vectorY;
-      } else {
-        cellValue.vectorY = !cellValue.vectorY;
-        // XChanged = true;
+      switch (cellValue.vector) {
+        case Vector[1]:
+        case null:
+          cellValue.vector = Vector[2];
+          break;
+        case Vector[0]:
+          cellValue.vector = Vector[3];
+          break;
+        case Vector[2]:
+          cellValue.vector = Vector[0];
+          break;
+        case Vector[3]:
+          cellValue.vector = Vector[1];
+          break;
       }
     } else {
-      if (!cellValue.vectorY && cellValue.vectorX) {
-        cellValue.vectorX = !cellValue.vectorX;
-        XChanged = true;
-      } else if (cellValue.vectorY && cellValue.vectorX) {
-        cellValue.vectorY = !cellValue.vectorY;
-      } else if (cellValue.vectorY && !cellValue.vectorX) {
-        cellValue.vectorX = !cellValue.vectorX;
-        XChanged = true;
-      } else {
-        cellValue.vectorX = !cellValue.vectorX;
-        XChanged = true;
+      switch (cellValue.vector) {
+        case Vector[1]:
+        case null:
+          cellValue.vector = Vector[3];
+          break;
+        case Vector[0]:
+          cellValue.vector = Vector[2];
+          break;
+        case Vector[2]:
+          cellValue.vector = Vector[1];
+          break;
+        case Vector[3]:
+          cellValue.vector = Vector[0];
+          break;
       }
     }
 
-
-    if (XChanged) {
-      if (!cellValue.vectorX) {
-        this.antX -= this.cellWidth;
-      } else {
-        this.antX += this.cellWidth;
-      }
-    } else {
-      if (!cellValue.vectorY) {
+    switch (cellValue.vector) {
+      case Vector[0]:
         this.antY -= this.cellWidth;
-      } else {
+        // this.antX -= this.cellWidth;
+        break;
+      case Vector[1]:
         this.antY += this.cellWidth;
-      }
+        // this.antX += this.cellWidth;
+        break;
+      case Vector[2]:
+        this.antX -= this.cellWidth;
+        // this.antY -= this.cellWidth;
+        break;
+      case Vector[3]:
+        this.antX += this.cellWidth;
+        // this.antY += this.cellWidth;
+        break;
     }
   }
 }

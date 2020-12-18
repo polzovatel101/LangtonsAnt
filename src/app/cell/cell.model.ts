@@ -2,12 +2,10 @@ import {CellInterface} from './cell.interface';
 
 export class CellModel implements CellInterface {
   public value: boolean;
-  public vectorX: boolean;
-  public vectorY: boolean;
+  public vector: string;
 
-  constructor(cellValue?: boolean, vectorX?: boolean, vectorY?: boolean) {
+  constructor(cellValue?: boolean, vector?: string) {
     this.value = cellValue || false;
-    this.vectorX = vectorX || false;
-    this.vectorY = vectorY || false;
+    this.vector = vector || null;
   }
 }
