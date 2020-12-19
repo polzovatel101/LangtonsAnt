@@ -110,36 +110,46 @@ export class AppComponent {
   }
 
   turnAnt(cellValue): void {
+    // turn right for white cell
     if (cellValue.value) {
       switch (this.currentVector) {
+        // from 'up' to 'right'
         case Vector[1]:
         case null:
         case undefined:
           this.currentVector = Vector[3];
           break;
+        // from 'down' to 'left'
         case Vector[0]:
           this.currentVector = Vector[2];
           break;
+        // from 'left' to 'up'
         case Vector[2]:
           this.currentVector = Vector[1];
           break;
         case Vector[3]:
+          // from 'right' to 'down'
           this.currentVector = Vector[0];
           break;
       }
     } else {
+      // turn left for black cell
       switch (this.currentVector) {
+        // from 'up' to 'left'
         case Vector[1]:
         case null:
         case undefined:
           this.currentVector = Vector[2];
           break;
+        // from 'down' to 'right'
         case Vector[0]:
           this.currentVector = Vector[3];
           break;
+        // from 'left' to 'down'
         case Vector[2]:
           this.currentVector = Vector[0];
           break;
+        // from 'right' to 'up'
         case Vector[3]:
           this.currentVector = Vector[1];
           break;
@@ -150,21 +160,25 @@ export class AppComponent {
   moveAnt(): void {
     switch (this.currentVector) {
       case Vector[0]:
+        // move down on Y for 'down' value
         if (this.antY < (this.cellWidth * this.columnsNumber - this.cellWidth)) {
           this.antY += this.cellWidth;
         }
         break;
       case Vector[1]:
+        // move up on Y for 'up' value
         if (this.antY > this.cellWidth) {
           this.antY -= this.cellWidth;
         }
         break;
       case Vector[2]:
+        // move left on X for 'left' value
         if (this.antX > this.cellWidth) {
           this.antX -= this.cellWidth;
         }
         break;
       case Vector[3]:
+        // move right on X for 'right' value
         if (this.antX < (this.cellWidth * this.rowsNumber - this.cellWidth)) {
           this.antX += this.cellWidth;
         }
