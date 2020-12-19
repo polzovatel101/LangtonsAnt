@@ -12,46 +12,37 @@ export class AppComponent {
   title = 'LangtonsAnt';
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private rightPressed = false;
-  private leftPressed = false;
-  private paddleHeight = 10;
-  private paddleWidth = 75;
-  private paddleX;
-  private x;
-  private y;
-  private dx;
-  private dy;
-  private columnsNumber = 10;
-  private rowsNumber = 10;
-  private cellWidth = 50;
+  private columnsNumber = 20;
+  private rowsNumber = 20;
+  private cellWidth = 25;
+  // if cell value is true -> white cell
   private cells: [[CellInterface]] = [[new CellModel()]];
   private antX: number;
   private antY: number;
+  private currentVector: string;
 
   constructor() {
     this.canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d');
-    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-    this.x = this.canvas.width / 2;
-    this.y = this.canvas.height - 30;
-    this.dx = 2;
-    this.dy = -2;
+    // place ant on center (doesn't work for even number of rows and columns)
     this.antX = ((this.columnsNumber / 2) * this.cellWidth) + this.cellWidth / 2;
     this.antY = ((this.rowsNumber / 2) * this.cellWidth) + this.cellWidth / 2;
 
     this.createCells();
 
+    // redraw cells and check currrent cell to move
     setInterval(() => {
-      // TODO: change on requestAnimationFrame(draw);
       this.draw();
-    }, 1000);
+      this.checkSelectedCell();
+    }, 100);
   }
 
   draw(): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.renderCells();
     this.renderAnt();
-    this.checkSelectedCell();
+    // uncomment to make it faster (should commit setInterval before)
+    // requestAnimationFrame(() => this.draw());
   }
 
   createCells(): void {
@@ -61,23 +52,31 @@ export class AppComponent {
           this.cells[i] = [new CellModel()];
         }
 
-        this.cells[i][j] = new CellModel(Math.random() > 0.5);
+        // to randomize cells uncomment
+        // this.cells[i][j] = new CellModel(Math.random() >= 0.5);
+        // instead of
+        this.cells[i][j] = new CellModel(true);
       }
     }
   }
 
   renderCells(): void {
     this.ctx.beginPath();
+    // border color
     this.ctx.strokeStyle = 'grey';
     for (let i = 0; i < this.cells.length; i++) {
       for (let j = 0; j < this.cells[i].length; j++) {
         if (this.cells[i][j].value) {
+          // cell color
           this.ctx.fillStyle = 'white';
         } else {
+          // cell color
           this.ctx.fillStyle = 'grey';
         }
 
+        // draw rectangle (cell)
         this.ctx.fillRect(i * this.cellWidth, j * this.cellWidth, this.cellWidth, this.cellWidth);
+        // draw border of cell
         this.ctx.strokeRect(i * this.cellWidth, j * this.cellWidth, this.cellWidth, this.cellWidth);
       }
     }
@@ -100,64 +99,75 @@ export class AppComponent {
       const cellValue = this.cells[i][j];
 
       if (cellValue) {
-       this.moveAnt(cellValue);
+        // turn ant left/right and move depends on cell value
+        this.turnAnt(cellValue);
+        this.moveAnt();
       }
 
-      this.cells[i][j].value = !this.cells[i][j].value;
+      // change cell value(color) after visit
+      cellValue.value = !cellValue.value;
     }
   }
 
-  moveAnt(cellValue: CellInterface): void {
+  turnAnt(cellValue): void {
     if (cellValue.value) {
-      switch (cellValue.vector) {
+      switch (this.currentVector) {
         case Vector[1]:
         case null:
-          cellValue.vector = Vector[2];
+        case undefined:
+          this.currentVector = Vector[3];
           break;
         case Vector[0]:
-          cellValue.vector = Vector[3];
+          this.currentVector = Vector[2];
           break;
         case Vector[2]:
-          cellValue.vector = Vector[0];
+          this.currentVector = Vector[1];
           break;
         case Vector[3]:
-          cellValue.vector = Vector[1];
+          this.currentVector = Vector[0];
           break;
       }
     } else {
-      switch (cellValue.vector) {
+      switch (this.currentVector) {
         case Vector[1]:
         case null:
-          cellValue.vector = Vector[3];
+        case undefined:
+          this.currentVector = Vector[2];
           break;
         case Vector[0]:
-          cellValue.vector = Vector[2];
+          this.currentVector = Vector[3];
           break;
         case Vector[2]:
-          cellValue.vector = Vector[1];
+          this.currentVector = Vector[0];
           break;
         case Vector[3]:
-          cellValue.vector = Vector[0];
+          this.currentVector = Vector[1];
           break;
       }
     }
+  }
 
-    switch (cellValue.vector) {
+  moveAnt(): void {
+    switch (this.currentVector) {
       case Vector[0]:
-        this.antY -= this.cellWidth;
-        // this.antX -= this.cellWidth;
+        if (this.antY < (this.cellWidth * this.columnsNumber - this.cellWidth)) {
+          this.antY += this.cellWidth;
+        }
         break;
       case Vector[1]:
-        this.antY += this.cellWidth;
-        // this.antX += this.cellWidth;
+        if (this.antY > this.cellWidth) {
+          this.antY -= this.cellWidth;
+        }
         break;
       case Vector[2]:
-        this.antX -= this.cellWidth;
-        // this.antY -= this.cellWidth;
+        if (this.antX > this.cellWidth) {
+          this.antX -= this.cellWidth;
+        }
         break;
       case Vector[3]:
-        this.antX += this.cellWidth;
-        // this.antY += this.cellWidth;
+        if (this.antX < (this.cellWidth * this.rowsNumber - this.cellWidth)) {
+          this.antX += this.cellWidth;
+        }
         break;
     }
   }
